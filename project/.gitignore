@@ -1,0 +1,23 @@
+# --- Secrets: NEVER commit your real .env ---
+.env
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+
+# --- Streamlit ---
+.streamlit/secrets.toml
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
+
+# --- Editors ---
+.vscode/
+.idea/

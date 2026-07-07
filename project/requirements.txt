@@ -1,0 +1,21 @@
+# === Core agent frameworks ===
+crewai[tools]>=0.140.0
+langgraph>=0.6.0
+langchain-core>=0.3.0
+
+# === Day 1 LangChain chat-model providers (only 02_langchain_tool_chain.py) ===
+langchain-google-genai>=2.0.0   # Gemini
+langchain-groq>=0.2.0            # Groq
+langchain-openai>=0.2.0          # OpenRouter (OpenAI-compatible endpoint)
+
+# === Config / env ===
+python-dotenv>=1.0.0
+pyyaml>=6.0
+
+# === Free tools ===
+tavily-python>=0.5.0   # optional - free 1,000 credits/month, no card
+ddgs>=9.0.0             # DuckDuckGo search - 100% free, no key needed at all
+requests>=2.31.0        # weather tool (Open-Meteo) + currency tool (open.er-api.com), both free/no key
+
+# === UI ===
+streamlit>=1.38.0

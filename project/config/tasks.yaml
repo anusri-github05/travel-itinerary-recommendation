@@ -1,0 +1,209 @@
+# =============================================================================
+# TASKS -- the "WHAT" of your crew.
+#
+# Every task needs:
+#   description      -> precise instructions. Anything inside {curly_braces}
+#                        gets filled in at runtime by graph_workflow.py
+#                        using Python's str.format().
+#   expected_output   -> tells the agent EXACTLY what shape the answer
+#                        should take. This is the #1 lever for getting
+#                        consistent, parseable output out of an LLM. Be
+#                        strict here -- especially about any line your
+#                        Python code needs to read back out later.
+#
+# The first two tasks are COMPLETE worked examples. Notice how strict their
+# expected_output sections are about machine-readable lines (VERDICT:,
+# SUGGESTED_BUDGET_INR:, BASES:) -- your Python code parses those exact
+# lines back out of the LLM's free text. Copy that trick in your own tasks.
+# =============================================================================
+
+feasibility_task:
+  description: >
+    A traveler from India wants this trip:
+      Destination (may be a city, a state, or a whole country): {destination}
+      Expectations: {expectations}
+      Trip length: {trip_length_days} days.
+      TOTAL budget for the whole trip: Rs. {budget_inr} (Indian Rupees, INR).
+
+    Your job is a REALITY CHECK, not a plan. Estimate the realistic MINIMUM
+    total cost (in INR) of meeting those expectations at that destination
+    for that many days -- include getting there from India (or within India),
+    staying, eating, and the activities their expectations imply.
+
+    Use the web search tool if you need current price levels, and use the
+    Currency Converter tool for ANY price you find in a foreign currency --
+    never convert in your head.
+
+    Then compare that realistic minimum with their stated budget:
+      - Budget comfortably covers it        -> verdict REALISTIC
+      - Budget is close (within ~25% short) -> verdict TIGHT
+      - Budget is far below what's needed   -> verdict UNREALISTIC
+
+  expected_output: >
+    Your FIRST line must be exactly: "VERDICT: <REALISTIC or TIGHT or UNREALISTIC>"
+    Your SECOND line must be exactly: "SUGGESTED_BUDGET_INR: <number>"
+    (the logical total INR budget for these expectations -- no currency
+    symbol, no commas; if their budget is fine, just repeat their budget).
+    Then a short explanation (4-7 sentences): what the money realistically
+    buys, where the biggest costs are, and -- if the verdict is TIGHT or
+    UNREALISTIC -- what they COULD do instead at their stated budget.
+
+destination_task:
+  description: >
+    A traveler gave this destination: {destination}
+    (It may be a specific city, a state/region, or a whole country.)
+    Their expectations for the trip: {expectations}.
+    Trip length: {trip_length_days} days.
+
+    Design a realistic ROUTE, not just one pin on the map:
+      - Up to 4 days: ONE base city/town is usually right.
+      - 5 to 7 days: TWO bases that pair naturally (a short hop apart).
+      - 8+ days: TWO or THREE bases forming a sensible line or loop.
+    Never add a base that eats half a day of travel to reach from the
+    previous one unless the destination truly demands it.
+
+    If they already named one specific city, keep it as the anchor and
+    only add a nearby second base if the trip length justifies it.
+
+    For every base: say how many nights it gets.
+    For every hop between bases: give the transport mode and approximate
+    door-to-door travel time.
+
+    Use the web search tool to check at least one current, concrete fact
+    before committing.
+
+  expected_output: >
+    Your FIRST line must be exactly:
+    "BASES: <city1>, <city2>, ..."
+    Then provide:
+    - Number of nights at each base.
+    - Transport mode and travel time between bases.
+    - A short explanation of why this route fits the traveler's expectations.
+
+itinerary_task:
+  description: >
+    Create a detailed itinerary for the traveler using these selected bases:
+    {selected_bases}.
+
+    Trip length: {trip_length_days} days.
+    Traveler expectations: {expectations}.
+
+    Prepare a complete day-by-day travel plan that follows the route order.
+
+    For every day include:
+      - Morning activities
+      - Afternoon activities
+      - Evening activities
+
+    Recommend several specific attractions, restaurants, markets,
+    viewpoints, museums, trekking routes, or experiences.
+
+    Include approximate travel time for EVERY movement:
+      - Between different base cities.
+      - Between attractions inside the same city.
+
+    Mention the transport method wherever appropriate.
+
+    Use the web search tool to include at least one real and current
+    recommendation such as a restaurant, local market, seasonal event,
+    festival, or trekking route.
+
+  expected_output: >
+    A markdown itinerary.
+
+    Begin with:
+    "ITINERARY"
+
+    Then provide one heading for each day:
+
+    ## Day 1 - <Base City>
+
+    Under each day include:
+
+    - Morning:
+      Activity
+      Approximate travel time
+
+    - Afternoon:
+      Activity
+      Approximate travel time
+
+    - Evening:
+      Activity
+      Approximate travel time
+
+    If traveling between base cities, clearly mention:
+
+    "<City A> -> <City B>: <Transport>, approximately <time>"
+
+budget_task:
+  description: >
+    Review the following itinerary:
+
+    {itinerary}
+
+    Trip length:
+    {trip_length_days} days.
+
+    Total budget provided by traveler:
+    Rs. {budget_inr}
+
+    Bases:
+    {selected_bases}
+
+    Assume one traveler unless the itinerary clearly specifies otherwise.
+
+    Estimate realistic costs for:
+
+    - Transportation to destination
+    - Intercity transportation between bases
+    - Local transportation
+    - Hotel stay
+    - Food
+    - Attractions
+    - Miscellaneous expenses
+
+    If any price is available only in a foreign currency,
+    convert it into INR using the Currency Converter tool.
+    Never perform manual currency conversion.
+
+    Use the Expense Calculator tool with your best INR estimates.
+
+    Pass:
+
+    - travel_fare
+    - accommodation
+    - food
+    - activities
+    - intercity_transport_total
+    - miscellaneous
+
+    Then combine the calculated expenses with the itinerary into one
+    complete traveler-ready travel plan.
+
+  expected_output: >
+    The FIRST line must be exactly:
+
+    "TOTAL_COST_INR: <number>"
+
+    (No currency symbol and no commas.)
+
+    Then provide:
+
+    # Final Travel Plan
+
+    - Destination
+    - Trip duration
+    - Bases visited
+    - Complete itinerary summary
+    - Expense breakdown:
+        • Travel
+        • Accommodation
+        • Food
+        • Activities
+        • Intercity Transport
+        • Miscellaneous
+    - Grand Total
+    - Compare the total with the traveler's budget.
+    - Mention whether the traveler is within budget or over budget.
+    - End with practical money-saving tips if applicable.

@@ -1,0 +1,44 @@
+# --- Secrets: NEVER commit a real .env (root, day1/, or project/) ---
+.env
+
+# --- Instructor-only: keep answers out of anything students clone ---
+ANSWERS.md
+project_result/
+make_project_result.py
+
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+
+# --- Streamlit ---
+.streamlit/secrets.toml
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
+
+# --- Editors ---
+.vscode/
+.idea/
+
+# Ignore documentation
+00_README.md
+01_Agenda.md
+02_Concept_Explainers.md
+03_Setup_Guide.md
+04_Student_Perks_202*.md
+05_Presentation_Guide.md
+06_PPT_Prompt.md
+ANSWERS.md
+
+project_result/
+basics/
+check.py
+
+
